@@ -44,7 +44,7 @@ waitForEvents.prototype = {
     node.firedEvents = {};
     this.registry = {};
 
-    for each (var e in events) {
+    for (var e of events) {
       var listener = function (event) {
         this.firedEvents[event.type] = true;
       }
