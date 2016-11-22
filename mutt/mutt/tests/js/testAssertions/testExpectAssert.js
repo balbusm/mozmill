@@ -94,7 +94,7 @@ SoftExpect.prototype._logFail = function SoftExpect__logFail(aResult) {
 var testExpect = function () {
   let softExpect = new SoftExpect();
 
-  for each (let test in TEST_DATA) {
+  for (let test of TEST_DATA) {
     var message = "expect." + test.fun + " for [" +
                   test.params.join(", ") + "]";
     if (test.throws) {
@@ -112,7 +112,7 @@ var testExpect = function () {
  * Tests for supported assert methods
  */
 var testAssert = function () {
-  for each (let test in TEST_DATA) {
+  for (let test of TEST_DATA) {
     let message = "assert." + test.fun + " for [" +
                   test.params.join(", ") + "]";
 
