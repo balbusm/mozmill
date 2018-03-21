@@ -28,7 +28,7 @@ var sleep = utils.sleep;
 // For Mozmill 1.5 backward compatibility
 var windowMap = windows.map;
 
-waitForEvents = function () {
+var waitForEvents = function () {
 }
 
 waitForEvents.prototype = {
@@ -991,8 +991,12 @@ function browserAdditions (controller) {
         return windows.map.hasPageLoaded(winId);
       }, "Timeout", timeout, aInterval);
     }
-    catch (ex if ex instanceof errors.TimeoutError) {
-      timed_out = true;
+    catch (ex) {
+      if (ex instanceof errors.TimeoutError) {
+        timed_out = true;
+      } else {
+        throw ex;
+      }
     }
     finally {
       if (timed_out) {

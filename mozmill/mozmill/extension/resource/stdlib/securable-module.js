@@ -319,8 +319,13 @@
        var channel = ios.newChannelFromURI(newURI);
        try {
          channel.open().close();
-       } catch (e if e.result == Cr.NS_ERROR_FILE_NOT_FOUND) {
-         return null;
+       } catch (e) {
+         if (e.result == Cr.NS_ERROR_FILE_NOT_FOUND) {
+           return null;
+         } else {
+           throw e;
+         }
+
        }
        return newURI.spec;
      },
@@ -348,13 +353,13 @@
      global.SecurableModule = exports;
    } else if (global.exports) {
      // We're being loaded in a SecurableModule.
-     for (name in exports) {
+     for (let name in exports) {
        global.exports[name] = exports[name];
      }
    } else {
      // We're being loaded in a JS module.
      global.EXPORTED_SYMBOLS = [];
-     for (name in exports) {
+     for (let name in exports) {
        global.EXPORTED_SYMBOLS.push(name);
        global[name] = exports[name];
      }
