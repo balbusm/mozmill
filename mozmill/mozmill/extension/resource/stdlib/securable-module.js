@@ -217,8 +217,9 @@
            var exports = {};
            var sandbox = self.sandboxFactory.createSandbox(options);
            self.sandboxes[path] = sandbox;
-           for (name in self.globals)
+           for (let name in self.globals) {
              sandbox.defineProperty(name, self.globals[name]);
+           }
            sandbox.defineProperty('require', self._makeRequire(path));
            sandbox.evaluate("var exports = {};");
            let ES5 = self.modules.es5;
