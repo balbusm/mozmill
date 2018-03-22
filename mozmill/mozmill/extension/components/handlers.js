@@ -63,9 +63,8 @@ var ConsoleObserver = {
 
   observe: function (aSubject, aTopic, aData) {
     var msg = aSubject.message;
-
     // If the message is not related to one of our extensions forget about it
-    if (!msg.contains('mozmill') && !msg.contains('jsbridge')) {
+    if (!msg.includes('mozmill') && !msg.includes('jsbridge')) {
       return
     }
 
