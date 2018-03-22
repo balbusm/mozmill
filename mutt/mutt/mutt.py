@@ -193,7 +193,7 @@ def test_all_js(tests, options):
 
     m = mozmill.MozMill.create(handlers=[logger], app=options.app)
     try:
-        m.run(tests, options.restart)
+        m.run(tests, options)
     except:
         exception_type, exception, tb = sys.exc_info()
         traceback.print_exception(exception_type, exception, tb)

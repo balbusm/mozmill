@@ -417,15 +417,17 @@ class MozMill(object):
 
         return frame
 
-    def run(self, tests, restart=False):
+    def run(self, tests, options):
         """Run all the tests.
 
         Arguments:
         tests -- Tests (array) which have to be executed
 
         Keyword Arguments:
-        restart -- If True the application will be restarted between each test
-
+        options
+            restart -- If True the application will be restarted between each test
+            pause_on_start: -- pauses test run till CTRL + C pressed on termial
+            pause_on_end: -- pauses after test run finishes, CTRL + C resumes
         """
         try:
             frame = None
@@ -455,12 +457,16 @@ class MozMill(object):
                     continue
 
                 try:
-                    frame = self.run_test_file(frame or self.start_runner(),
-                                               test['path'])
+                    if not frame:
+                        frame = self.start_runner()
+                        if options.pause_on_start:
+                            self.wait_for_interruption()
+
+                    frame = self.run_test_file(frame, test['path'])
 
                     # If a restart is requested between each test stop the runner
                     # and reset the profile
-                    if restart:
+                    if options.restart:
                         self.stop_runner()
                         frame = None
 
@@ -472,12 +478,22 @@ class MozMill(object):
 
             # stop the runner
             if frame:
+                if options.pause_on_end:
+                    self.wait_for_interruption()
                 self.stop_runner()
 
         finally:
             # shutdown the test harness cleanly
             self.stop()
             self.running_test = None
+
+    def wait_for_interruption(self):
+        try:
+            print "Waiting for interruption signal..."
+            self.runner.wait()
+        except (KeyboardInterrupt):
+            print "Resumed execution"
+            pass
 
     def get_appinfo(self):
         """Collect application specific information."""
@@ -787,6 +803,14 @@ class CLI(mozrunner.CLI):
                          action='store_true', default=False,
                          help="start the browser without running any tests")
 
+        group.add_option('-s', '--pause-on-start', dest='pause_on_start',
+                         action='store_true', default=False,
+                         help="pause mozmill before running any test")
+
+        group.add_option('-e', '--pause-on-end', dest='pause_on_end',
+                         action='store_true', default=False,
+                         help="pause mozmill after running all tests")
+
         parser.add_option_group(group)
 
         # add option for included event handlers
@@ -878,7 +902,7 @@ class CLI(mozrunner.CLI):
         exception = None
         tests = self.manifest.active_tests(**mozinfo.info)
         try:
-            mozmill.run(tests, self.options.restart)
+            mozmill.run(tests, self.options)
         except:
             exception_type, exception, tb = sys.exc_info()
 
